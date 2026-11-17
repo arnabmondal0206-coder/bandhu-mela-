@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "BANDHU MELA",
+    "slug": "bandhu-mela",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "bandhumela",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#7C3AED"
+    },
+    "android": {
+      "package": "com.bandhumela.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#7C3AED"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "bandhumela.app",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "BANDHU MELA needs photo access to share posts, stories, and profile pictures.",
+          "cameraPermission": "BANDHU MELA needs camera access for photos, reels, and live broadcasts."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "BANDHU MELA needs microphone access for Audio Party rooms, voice calls, and live broadcasts."
+        }
+      ]
+    ]
+  }
+}

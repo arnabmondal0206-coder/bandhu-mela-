@@ -1,0 +1,41 @@
+{
+  "cli": {
+    "version": ">= 14.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://ais-pre-efxh6dp6beysynro5ox2cv-633625741621.asia-east1.run.app"
+      }
+    },
+    "apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://ais-pre-efxh6dp6beysynro5ox2cv-633625741621.asia-east1.run.app"
+      }
+    },
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://ais-pre-efxh6dp6beysynro5ox2cv-633625741621.asia-east1.run.app"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

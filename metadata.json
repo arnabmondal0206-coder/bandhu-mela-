@@ -1,0 +1,6 @@
+{
+  "name": "BANDHU MELA",
+  "description": "Connect • Share • Chat • Make Friends — Real-time social media platform across web and Android with Firebase.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

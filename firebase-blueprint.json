@@ -1,0 +1,735 @@
+{
+  "entities": {
+    "UserPublicProfile": {
+      "title": "UserPublicProfile",
+      "description": "Public user profile data visible to authenticated users (PII-free).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "username": { "type": "string", "minLength": 3, "maxLength": 30, "pattern": "^[a-z0-9_]+$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "bio": { "type": "string", "maxLength": 300 },
+        "location": { "type": "string", "maxLength": 80 },
+        "workOrBioTag": { "type": "string", "maxLength": 80 },
+        "photoURL": { "type": "string", "maxLength": 2000 },
+        "coverURL": { "type": "string", "maxLength": 2000 },
+        "profileVisibility": { "type": "string", "enum": ["public", "friends"] },
+        "messagePrivacy": { "type": "string", "enum": ["everyone", "friends"] },
+        "showOnlineStatus": { "type": "boolean" },
+        "followersCount": { "type": "number" },
+        "followingCount": { "type": "number" },
+        "postsCount": { "type": "number" },
+        "isSuspended": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "uid", "username", "displayName", "bio", "location", "workOrBioTag",
+        "photoURL", "coverURL", "profileVisibility", "messagePrivacy", "showOnlineStatus",
+        "followersCount", "followingCount", "postsCount", "isSuspended", "createdAt", "updatedAt"
+      ]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Isolated PII and role metadata accessible only to the owner or an admin.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "maxLength": 120 },
+        "phoneNumber": { "type": "string", "maxLength": 24 },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "phoneNumber", "role", "createdAt", "updatedAt"]
+    },
+    "SavedPost": {
+      "title": "SavedPost",
+      "description": "Bookmarked post reference for a user.",
+      "type": "object",
+      "properties": {
+        "postId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["postId", "userId", "createdAt"]
+    },
+    "UserPresence": {
+      "title": "UserPresence",
+      "description": "Real-time online/offline presence and last seen timestamp.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "isOnline": { "type": "boolean" },
+        "lastSeen": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "isOnline", "lastSeen", "updatedAt"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "Community feed post or short video reel.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "authorUsername": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "authorPhoto": { "type": "string", "maxLength": 2000 },
+        "caption": { "type": "string", "maxLength": 2200 },
+        "hashtags": { "type": "array", "description": "Bounded list of up to 15 hashtags." },
+        "mediaUrl": { "type": "string", "maxLength": 2000 },
+        "mediaType": { "type": "string", "enum": ["text", "image", "video", "reel"] },
+        "aspectRatio": { "type": "string", "enum": ["1:1", "4:3", "9:16", "16:9"] },
+        "likesCount": { "type": "number" },
+        "commentsCount": { "type": "number" },
+        "sharesCount": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "hidden"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id", "authorId", "authorName", "authorUsername", "authorPhoto",
+        "caption", "hashtags", "mediaUrl", "mediaType", "aspectRatio",
+        "likesCount", "commentsCount", "sharesCount", "status", "createdAt", "updatedAt"
+      ]
+    },
+    "Story": {
+      "title": "Story",
+      "description": "24-hour ephemeral photo or video story.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "authorUsername": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "authorPhoto": { "type": "string", "maxLength": 2000 },
+        "mediaUrl": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "mediaType": { "type": "string", "enum": ["image", "video"] },
+        "caption": { "type": "string", "maxLength": 300 },
+        "viewersCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id", "authorId", "authorName", "authorUsername", "authorPhoto",
+        "mediaUrl", "mediaType", "caption", "viewersCount", "createdAt", "expiresAt"
+      ]
+    },
+    "PostLike": {
+      "title": "PostLike",
+      "description": "User like record on a post.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "postId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "postId", "createdAt"]
+    },
+    "PostComment": {
+      "title": "PostComment",
+      "description": "Comment on a feed post or reel.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "postId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "authorUsername": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "authorPhoto": { "type": "string", "maxLength": 2000 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "postId", "authorId", "authorName", "authorUsername", "authorPhoto", "text", "createdAt"]
+    },
+    "Follow": {
+      "title": "Follow",
+      "description": "Directional follow relationship.",
+      "type": "object",
+      "properties": {
+        "followerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "followingId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["followerId", "followingId", "createdAt"]
+    },
+    "FriendRequest": {
+      "title": "FriendRequest",
+      "description": "Friend request and acceptance state.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 260, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "senderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "senderName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "senderUsername": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "senderPhoto": { "type": "string", "maxLength": 2000 },
+        "receiverId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "receiverName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "receiverUsername": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "receiverPhoto": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["pending", "accepted", "declined"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id", "senderId", "senderName", "senderUsername", "senderPhoto",
+        "receiverId", "receiverName", "receiverUsername", "receiverPhoto",
+        "status", "createdAt", "updatedAt"
+      ]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Private 1-to-1 or Group chat room.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 260, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "isGroup": { "type": "boolean" },
+        "groupName": { "type": "string", "maxLength": 80 },
+        "groupPhoto": { "type": "string", "maxLength": 2000 },
+        "createdBy": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "participantA": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "participantB": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "participants": { "type": "array", "description": "Bounded list of up to 25 participant UIDs." },
+        "participantAName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "participantAPhoto": { "type": "string", "maxLength": 2000 },
+        "participantBName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "participantBPhoto": { "type": "string", "maxLength": 2000 },
+        "lastMessage": { "type": "string", "maxLength": 500 },
+        "lastSenderId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id", "isGroup", "groupName", "groupPhoto", "createdBy",
+        "participantA", "participantB", "participants",
+        "participantAName", "participantAPhoto", "participantBName", "participantBPhoto",
+        "lastMessage", "lastSenderId", "createdAt", "updatedAt"
+      ]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Real-time message in a 1-to-1 or group conversation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "conversationId": { "type": "string", "minLength": 1, "maxLength": 260, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "senderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "senderName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "senderPhoto": { "type": "string", "maxLength": 2000 },
+        "participants": { "type": "array", "description": "Bounded participant UIDs matching parent conversation." },
+        "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "mediaUrl": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "conversationId", "senderId", "senderName", "senderPhoto", "participants", "text", "mediaUrl", "createdAt"]
+    },
+    "LiveStream": {
+      "title": "LiveStream",
+      "description": "Live video broadcast session with WebRTC signaling.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "hostId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "hostName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "hostUsername": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "hostPhoto": { "type": "string", "maxLength": 2000 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "status": { "type": "string", "enum": ["live", "ended"] },
+        "viewersCount": { "type": "number" },
+        "reactionsCount": { "type": "number" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id", "hostId", "hostName", "hostUsername", "hostPhoto",
+        "title", "status", "viewersCount", "reactionsCount", "startedAt", "updatedAt"
+      ]
+    },
+    "LiveComment": {
+      "title": "LiveComment",
+      "description": "Live comment or reaction event on a broadcast.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "streamId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "authorPhoto": { "type": "string", "maxLength": 2000 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "kind": { "type": "string", "enum": ["comment", "reaction"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "streamId", "authorId", "authorName", "authorPhoto", "text", "kind", "createdAt"]
+    },
+    "LiveViewer": {
+      "title": "LiveViewer",
+      "description": "Viewer presence in a live stream.",
+      "type": "object",
+      "properties": {
+        "viewerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "streamId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "viewerName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["viewerId", "streamId", "viewerName", "joinedAt"]
+    },
+    "WebRTCSignal": {
+      "title": "WebRTCSignal",
+      "description": "WebRTC SDP/ICE signaling packet between host and viewer.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "streamId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "fromUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "toUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "type": { "type": "string", "enum": ["offer", "answer", "ice"] },
+        "payload": { "type": "string", "minLength": 1, "maxLength": 16000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "streamId", "fromUid", "toUid", "type", "payload", "createdAt"]
+    },
+    "CallSession": {
+      "title": "CallSession",
+      "description": "1-to-1 voice or video WebRTC call session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "callerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "callerName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "callerPhoto": { "type": "string", "maxLength": 2000 },
+        "calleeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "calleeName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "calleePhoto": { "type": "string", "maxLength": 2000 },
+        "participants": { "type": "array", "description": "Two-element list [callerId, calleeId]." },
+        "callType": { "type": "string", "enum": ["audio", "video"] },
+        "status": { "type": "string", "enum": ["ringing", "active", "ended", "declined", "missed"] },
+        "offerSdp": { "type": "string", "maxLength": 16000 },
+        "answerSdp": { "type": "string", "maxLength": 16000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id", "callerId", "callerName", "callerPhoto",
+        "calleeId", "calleeName", "calleePhoto",
+        "participants", "callType", "status", "offerSdp", "answerSdp",
+        "createdAt", "updatedAt"
+      ]
+    },
+    "CallCandidate": {
+      "title": "CallCandidate",
+      "description": "ICE candidate for a 1-to-1 WebRTC call.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "callId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "senderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "participants": { "type": "array", "description": "Two-element list matching parent call." },
+        "candidate": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "callId", "senderId", "participants", "candidate", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User activity notification.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "recipientId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "actorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "actorName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "actorPhoto": { "type": "string", "maxLength": 2000 },
+        "type": { "type": "string", "enum": ["like", "comment", "follow", "friend_request", "friend_accept", "message", "live", "call", "system"] },
+        "postId": { "type": "string", "maxLength": 128 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "recipientId", "actorId", "actorName", "actorPhoto", "type", "postId", "message", "read", "createdAt"]
+    },
+    "Block": {
+      "title": "Block",
+      "description": "User block record.",
+      "type": "object",
+      "properties": {
+        "blockerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "blockedId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["blockerId", "blockedId", "createdAt"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Moderation report filed by a user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "reporterId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "reporterUsername": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "targetType": { "type": "string", "enum": ["post", "user", "comment"] },
+        "targetId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "targetOwnerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "details": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["open", "reviewed", "resolved", "dismissed"] },
+        "adminNotes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "reporterId", "reporterUsername", "targetType", "targetId", "targetOwnerId", "reason", "details", "status", "adminNotes", "createdAt", "updatedAt"]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted administrator or moderator marker document.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "grantedBy": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "role": { "type": "string", "enum": ["admin", "moderator"] },
+        "isSuspended": { "type": "boolean" },
+        "displayName": { "type": "string", "maxLength": 60 },
+        "email": { "type": "string", "maxLength": 120 },
+        "notes": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "grantedBy", "createdAt"]
+    },
+    "OwnerRegistry": {
+      "title": "OwnerRegistry",
+      "description": "Immutable Super Admin original owner UID lock record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "enum": ["original"] },
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "maxLength": 120 },
+        "role": { "type": "string", "enum": ["super_admin_owner"] },
+        "locked": { "type": "boolean" },
+        "claimedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "uid", "email", "role", "locked", "claimedAt"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "Platform-wide announcement published by an authorized owner or admin.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "priority": { "type": "string", "enum": ["normal", "important"] },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "message", "priority", "authorId", "authorName", "active", "createdAt", "updatedAt"]
+    },
+    "AppSettings": {
+      "title": "AppSettings",
+      "description": "Live platform configuration managed by the app owner and admins.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "maintenanceMode": { "type": "boolean" },
+        "allowNewRegistrations": { "type": "boolean" },
+        "allowLiveStreaming": { "type": "boolean" },
+        "allowVideoReels": { "type": "boolean" },
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "welcomeHeadline": { "type": "string", "maxLength": 160 },
+        "updatedBy": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id", "maintenanceMode", "allowNewRegistrations", "allowLiveStreaming",
+        "allowVideoReels", "welcomeHeadline", "updatedBy", "updatedAt"
+      ]
+    },
+    "SupportTicket": {
+      "title": "SupportTicket",
+      "description": "Help center support request submitted by a user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "username": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "category": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1500 },
+        "status": { "type": "string", "enum": ["open", "in_review", "resolved"] },
+        "adminReply": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "username", "category", "subject", "message", "status", "adminReply", "createdAt", "updatedAt"]
+    },
+    "Community": {
+      "title": "Community",
+      "description": "User group or interest community.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 500 },
+        "category": { "type": "string", "minLength": 1, "maxLength": 50 },
+        "coverUrl": { "type": "string", "maxLength": 2000 },
+        "creatorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "creatorName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "membersCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "description", "category", "coverUrl", "creatorId", "creatorName", "membersCount", "createdAt", "updatedAt"]
+    },
+    "CommunityMember": {
+      "title": "CommunityMember",
+      "description": "Membership record inside a community.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "communityId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "photoURL": { "type": "string", "maxLength": 2000 },
+        "role": { "type": "string", "enum": ["admin", "member"] },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "communityId", "displayName", "photoURL", "role", "joinedAt"]
+    },
+    "CommunityPost": {
+      "title": "CommunityPost",
+      "description": "Discussion post inside a community.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "communityId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "authorName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "authorPhoto": { "type": "string", "maxLength": 2000 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 1500 },
+        "mediaUrl": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "communityId", "authorId", "authorName", "authorPhoto", "text", "mediaUrl", "createdAt"]
+    },
+    "SocialEvent": {
+      "title": "SocialEvent",
+      "description": "Community event with RSVP participation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "location": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "eventDate": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "coverUrl": { "type": "string", "maxLength": 2000 },
+        "hostId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "hostName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "attendeesCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "description", "location", "eventDate", "coverUrl", "hostId", "hostName", "attendeesCount", "createdAt", "updatedAt"]
+    },
+    "EventRsvp": {
+      "title": "EventRsvp",
+      "description": "User RSVP status for an event.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "eventId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "status": { "type": "string", "enum": ["going", "interested"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "eventId", "displayName", "status", "updatedAt"]
+    },
+    "VirtualGift": {
+      "title": "VirtualGift",
+      "description": "Catalog of virtual gifts managed exclusively by the Original Owner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "emoji": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "category": { "type": "string", "enum": ["classic", "royal", "celebration"] },
+        "coinPrice": { "type": "number" },
+        "animationType": { "type": "string", "enum": ["float", "burst", "crown", "sparkle", "couple_love"] },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "emoji", "category", "coinPrice", "animationType", "active", "createdAt", "updatedAt"]
+    },
+    "GiftEvent": {
+      "title": "GiftEvent",
+      "description": "Confirmed audio room gift transaction event broadcast to room participants.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "roomId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "roomTitle": { "type": "string", "maxLength": 120 },
+        "senderId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "senderName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "senderPhoto": { "type": "string", "maxLength": 2000 },
+        "recipientId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "recipientName": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "giftId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "giftName": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "giftEmoji": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "coinsCost": { "type": "number" },
+        "transactionId": { "type": "string", "maxLength": 128 },
+        "animationType": { "type": "string", "enum": ["float", "burst", "crown", "sparkle", "couple_love"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "roomId", "roomTitle", "senderId", "senderName", "senderPhoto", "recipientId", "recipientName", "giftId", "giftName", "giftEmoji", "coinsCost", "createdAt"]
+    },
+    "CoinEconomyConfig": {
+      "title": "CoinEconomyConfig",
+      "description": "Original Owner controlled coin reward schedules, limits, and rates.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "enum": ["coinEconomy"] },
+        "dailyBonusEnabled": { "type": "boolean" },
+        "dailyBonusCoins": { "type": "number" },
+        "weeklyBonusEnabled": { "type": "boolean" },
+        "weeklyBonusCoins": { "type": "number" },
+        "weeklyBonusWeekdayUtc": { "type": "number" },
+        "weeklyMinSpeakingMinutes": { "type": "number" },
+        "monthlyBonusEnabled": { "type": "boolean" },
+        "monthlyBonusCoins": { "type": "number" },
+        "monthlyBonusDayOfMonth": { "type": "number" },
+        "monthlyMinSpeakingMinutes": { "type": "number" },
+        "monthlyMinLevel": { "type": "number" },
+        "speakingRewardEnabled": { "type": "boolean" },
+        "speakingMinutesPerReward": { "type": "number" },
+        "speakingRewardCoins": { "type": "number" },
+        "speakingDailyMaxCoins": { "type": "number" },
+        "hostingBonusEnabled": { "type": "boolean" },
+        "hostingRateMode": { "type": "string", "enum": ["per_minute", "per_hour"] },
+        "hostingCoinsPerUnit": { "type": "number" },
+        "hostingMinListeners": { "type": "number" },
+        "hostingDailyMaxCoins": { "type": "number" },
+        "hostingMonthlyMaxCoins": { "type": "number" },
+        "updatedBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "dailyBonusEnabled", "dailyBonusCoins", "weeklyBonusEnabled", "weeklyBonusCoins", "monthlyBonusEnabled", "monthlyBonusCoins", "speakingRewardEnabled", "hostingBonusEnabled", "updatedBy", "updatedAt"]
+    },
+    "PromotionalPool": {
+      "title": "PromotionalPool",
+      "description": "Separate auditable promotional coin budget pool managed by Original Owner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "enum": ["main"] },
+        "issuedBudget": { "type": "number" },
+        "distributedCoins": { "type": "number" },
+        "remainingBudget": { "type": "number" },
+        "paused": { "type": "boolean" },
+        "perUserDailyCap": { "type": "number" },
+        "perUserMonthlyCap": { "type": "number" },
+        "maxSingleReward": { "type": "number" },
+        "updatedBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "issuedBudget", "distributedCoins", "remainingBudget", "paused", "perUserDailyCap", "perUserMonthlyCap", "maxSingleReward", "updatedBy", "createdAt", "updatedAt"]
+    },
+    "PromotionalLedgerEntry": {
+      "title": "PromotionalLedgerEntry",
+      "description": "Immutable promotional coin issuance and distribution ledger entry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "entryType": { "type": "string" },
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "coinsDelta": { "type": "number" },
+        "budgetImpact": { "type": "number" },
+        "remainingAfter": { "type": "number" },
+        "note": { "type": "string" },
+        "actorUid": { "type": "string" },
+        "referenceId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "entryType", "userId", "username", "coinsDelta", "budgetImpact", "remainingAfter", "note", "actorUid", "referenceId", "createdAt"]
+    },
+    "EconomyRewardClaim": {
+      "title": "EconomyRewardClaim",
+      "description": "Deterministic period claim record preventing duplicate daily, weekly, and monthly rewards.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "bonusType": { "type": "string", "enum": ["daily", "weekly", "monthly"] },
+        "periodKey": { "type": "string" },
+        "coinsAwarded": { "type": "number" },
+        "transactionId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "bonusType", "periodKey", "coinsAwarded", "transactionId", "createdAt"]
+    },
+    "UserEconomyProgress": {
+      "title": "UserEconomyProgress",
+      "description": "Per-user accumulated active speaking and hosting progress and reward caps.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "dayKey": { "type": "string" },
+        "monthKey": { "type": "string" },
+        "dailyPromoCoinsEarned": { "type": "number" },
+        "monthlyPromoCoinsEarned": { "type": "number" },
+        "speakingCarrySeconds": { "type": "number" },
+        "speakingDailyCoinsEarned": { "type": "number" },
+        "hostingCarrySeconds": { "type": "number" },
+        "hostingDailyCoinsEarned": { "type": "number" },
+        "hostingMonthlyCoinsEarned": { "type": "number" },
+        "lastSpeakingRewardAtMs": { "type": "number" },
+        "lastHostingRewardAtMs": { "type": "number" },
+        "lastRoomId": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "dayKey", "monthKey", "dailyPromoCoinsEarned", "monthlyPromoCoinsEarned", "speakingCarrySeconds", "speakingDailyCoinsEarned", "hostingCarrySeconds", "hostingDailyCoinsEarned", "hostingMonthlyCoinsEarned", "lastSpeakingRewardAtMs", "lastHostingRewardAtMs", "lastRoomId", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": { "$ref": "#/entities/UserPublicProfile" }, "description": "Public user profiles." },
+    "/users/{userId}/private/{docId}": { "schema": { "$ref": "#/entities/UserPrivateInfo" }, "description": "Owner-only PII and role." },
+    "/users/{userId}/savedPosts/{postId}": { "schema": { "$ref": "#/entities/SavedPost" }, "description": "Bookmarked posts." },
+    "/presence/{userId}": { "schema": { "$ref": "#/entities/UserPresence" }, "description": "Online status and last seen." },
+    "/admins/{userId}": { "schema": { "$ref": "#/entities/AdminRecord" }, "description": "Admin role grant records." },
+    "/ownerRegistry/{docId}": { "schema": { "$ref": "#/entities/OwnerRegistry" }, "description": "Immutable original Super Admin owner UID registry." },
+    "/announcements/{announcementId}": { "schema": { "$ref": "#/entities/Announcement" }, "description": "Platform announcements." },
+    "/appSettings/{settingId}": { "schema": { "$ref": "#/entities/AppSettings" }, "description": "Live platform settings and coin economy config." },
+    "/promotionalPool/{poolId}": { "schema": { "$ref": "#/entities/PromotionalPool" }, "description": "Auditable promotional coin reward budget pool." },
+    "/promotionalLedger/{entryId}": { "schema": { "$ref": "#/entities/PromotionalLedgerEntry" }, "description": "Immutable promotional coin ledger." },
+    "/economyClaims/{claimId}": { "schema": { "$ref": "#/entities/EconomyRewardClaim" }, "description": "Idempotent period reward claim locks." },
+    "/economyProgress/{userId}": { "schema": { "$ref": "#/entities/UserEconomyProgress" }, "description": "User speaking and hosting reward counters." },
+    "/supportTickets/{ticketId}": { "schema": { "$ref": "#/entities/SupportTicket" }, "description": "Help center support tickets." },
+    "/communities/{communityId}": { "schema": { "$ref": "#/entities/Community" }, "description": "Groups and communities." },
+    "/communities/{communityId}/members/{userId}": { "schema": { "$ref": "#/entities/CommunityMember" }, "description": "Community members." },
+    "/communities/{communityId}/posts/{postId}": { "schema": { "$ref": "#/entities/CommunityPost" }, "description": "Community discussion posts." },
+    "/events/{eventId}": { "schema": { "$ref": "#/entities/SocialEvent" }, "description": "Events and gatherings." },
+    "/events/{eventId}/rsvps/{userId}": { "schema": { "$ref": "#/entities/EventRsvp" }, "description": "Event RSVPs." },
+    "/posts/{postId}": { "schema": { "$ref": "#/entities/Post" }, "description": "Feed posts and reels." },
+    "/posts/{postId}/likes/{userId}": { "schema": { "$ref": "#/entities/PostLike" }, "description": "Post likes." },
+    "/posts/{postId}/comments/{commentId}": { "schema": { "$ref": "#/entities/PostComment" }, "description": "Post comments." },
+    "/stories/{storyId}": { "schema": { "$ref": "#/entities/Story" }, "description": "24-hour ephemeral stories." },
+    "/follows/{followId}": { "schema": { "$ref": "#/entities/Follow" }, "description": "Follow relationships." },
+    "/friendRequests/{requestId}": { "schema": { "$ref": "#/entities/FriendRequest" }, "description": "Friend requests." },
+    "/conversations/{conversationId}": { "schema": { "$ref": "#/entities/Conversation" }, "description": "1-to-1 and group chat rooms." },
+    "/conversations/{conversationId}/messages/{messageId}": { "schema": { "$ref": "#/entities/ChatMessage" }, "description": "Chat messages." },
+    "/liveStreams/{streamId}": { "schema": { "$ref": "#/entities/LiveStream" }, "description": "Live broadcasts." },
+    "/liveStreams/{streamId}/comments/{commentId}": { "schema": { "$ref": "#/entities/LiveComment" }, "description": "Live comments and reactions." },
+    "/liveStreams/{streamId}/viewers/{viewerId}": { "schema": { "$ref": "#/entities/LiveViewer" }, "description": "Live viewers." },
+    "/liveStreams/{streamId}/signals/{signalId}": { "schema": { "$ref": "#/entities/WebRTCSignal" }, "description": "WebRTC signaling for live streams." },
+    "/calls/{callId}": { "schema": { "$ref": "#/entities/CallSession" }, "description": "1-to-1 voice and video call sessions." },
+    "/calls/{callId}/candidates/{candidateId}": { "schema": { "$ref": "#/entities/CallCandidate" }, "description": "WebRTC ICE candidates for calls." },
+    "/notifications/{notificationId}": { "schema": { "$ref": "#/entities/Notification" }, "description": "User notifications." },
+    "/blocks/{blockId}": { "schema": { "$ref": "#/entities/Block" }, "description": "User block entries." },
+    "/reports/{reportId}": { "schema": { "$ref": "#/entities/Report" }, "description": "Moderation reports queue." },
+    "/virtualGifts/{giftId}": { "schema": { "$ref": "#/entities/VirtualGift" }, "description": "Owner-managed virtual gift catalog." },
+    "/giftEvents/{giftEventId}": { "schema": { "$ref": "#/entities/GiftEvent" }, "description": "Confirmed room gift transaction history." }
+  }
+}
